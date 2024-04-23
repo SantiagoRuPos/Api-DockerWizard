@@ -8,7 +8,7 @@ const connection = mysql.createConnection({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   port: process.env.DB_PORT,
-  connectTimeout: 60000 //
+
 });
 
 // Conexión a la base de datos
@@ -19,4 +19,4 @@ connection.connect((err) => {
   }
   console.log('Conexión exitosa a la base de datos MySQL');
 });
-//Solucionar :C
+module.exports = connection;
