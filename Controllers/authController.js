@@ -46,6 +46,10 @@ exports.UpdatePasswordByUsuer =async (req, res) => {
 exports.RegisterUser = async (req, res) => {
     const {Tipo_Identificacion_Usuario,Numero_Identificacion_Usuario,Nombre_Completo_Usuario,Correo_Institucional_Usuario,Numero_Contacto,Nombre_Usuario,Password_Usuario,Nombre_Usuario_Cygnus} = req.body;
     try {
+        const exiteUsuario = await userModel.getUserByUsername(Nombre_Usuario);
+        if (exiteUsuario) {
+            return res.status(400).json({ error: 'El usuario ya existe' });
+        }
         const hashedPassword = await bcrypt.hash(Password_Usuario,10);
         const Fecha_Registro_Usuario = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
