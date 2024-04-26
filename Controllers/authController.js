@@ -89,7 +89,21 @@ exports.RegisterUser = async (req, res) => {
 }
 
 exports.ListUser = async (req, res) => {
-    
+    const {Nombre_Usuario}=req.body;
+    try {
+      let usuario;
+      if (Nombre_Usuario){
+        usuario= await userModel.ListUsersByUserName(Nombre_Usuario);
+      } else {
+        usuario = await userModel.ListUsers();
+      }
+      return res.json ({usuario});
+    } catch (error) {
+      console.error("Error al obtener informacion de los usuarios: ", error);
+      return res.status(500).json({ error: 'Error interno del servidor' });
+
+
+    }
 }
 
 

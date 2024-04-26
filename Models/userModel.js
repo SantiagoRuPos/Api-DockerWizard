@@ -53,7 +53,7 @@ exports.RegisterUser = async (Tipo_Identificacion_Usuario,Numero_Identificacion_
                     reject (error);
                 } else {
                     console.log("Usuario resgistrado");
-             
+
                     resolve(results);
                 }
          })
@@ -62,7 +62,7 @@ exports.RegisterUser = async (Tipo_Identificacion_Usuario,Numero_Identificacion_
 
 exports.ListUsersByUserName = async(Nombre_Usuario) => {
      return new Promise((resolve, reject)=>{
-        const sql = 'SELECT Id_Usuario,Nombre_Complreto_Usuario,Nombre_Usuario_Cygnus,Correo_Institucional_Usuario,Conexion_Usuario,Estado_Usuario FROM Usuarios WHERE Nombre_Usuario = ?';
+        const sql = 'SELECT Id_Usuario,Nombre_Complreto_Usuario,Nombre_Usuario,Nombre_Usuario_Cygnus,Correo_Institucional_Usuario,Conexion_Usuario,Estado_Usuario FROM Usuarios WHERE Nombre_Usuario = ?';
         db.query(sql,[Nombre_Usuario],(error,results)=> {
             if (error) {
                 console.error("Error al listar : ", error);
@@ -75,3 +75,20 @@ exports.ListUsersByUserName = async(Nombre_Usuario) => {
 
      })
 }
+
+exports.ListUsers = async ()=> {
+  return new Promise((resolve, reject) => {
+    const sql ='SELECT  Id_Usuario,Nombre_Complreto_Usuario,Nombre_Usuario,Nombre_Usuario_Cygnus,Correo_Institucional_Usuario,Conexion_Usuario,Estado_Usuario FROM Usuarios';
+    db.query(sql,(error,results)=> {
+      if (error){
+        console.error("Error al listar los usuarios: ", error);
+        reject(error);
+      }else {
+        console.log("Usuarios listados");
+        resolve (results);
+      }
+
+    })
+  })
+}
+
