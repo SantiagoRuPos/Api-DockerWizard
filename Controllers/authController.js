@@ -4,7 +4,7 @@ const userModel = require ('../Models/userModel');
 const moment = require('moment-timezone');
 
 require('dotenv').config();
-
+ /////////API USUARIOS
 exports.login = async (req, res) => {
     const { Nombre_Usuario, Password_Usuario } = req.body;
 
@@ -13,9 +13,7 @@ exports.login = async (req, res) => {
         const user = await userModel.getUserByUsername(Nombre_Usuario);
 
         // Si el usuario no existe, o la contraseña no coincide, devolver un error
-        if (!user || !(await bcrypt.compare(Password_Usuario, user.Password_Usuario))) {
-            return res.status(401).json({ error: 'Usuario o contraseña incorrectos.' });
-        }
+        
 
         if (!user) {
             return res.status(401).json({ error: 'Usuario Incorrecto.' });
@@ -89,21 +87,47 @@ exports.RegisterUser = async (req, res) => {
 }
 
 exports.ListUser = async (req, res) => {
-    const {Nombre_Usuario}=req.body;
+    const { Nombre_Usuario } = req.body;
     try {
-      let usuario;
-      if (Nombre_Usuario){
-        usuario= await userModel.ListUsersByUserName(Nombre_Usuario);
-      } else {
-        usuario = await userModel.ListUsers();
-      }
-      return res.json ({usuario});
+        const ExisteUser = await userModel.getUserByUsername(Nombre_Usuario);
+        if (ExisteUser) {
+            const usuarios = await userModel.ListUsersByUserName(Nombre_Usuario); // Aquí obtenemos los usuarios
+            res.status(200).json({ message: "Usuarios Listados", usuarios }); // Enviamos los usuarios en la respuesta
+        } else {
+            return res.status(400).json({ error: 'El usuario no existe' });
+        }
     } catch (error) {
-      console.error("Error al obtener informacion de los usuarios: ", error);
-      return res.status(500).json({ error: 'Error interno del servidor' });
-
-
+        console.error("Error al obtener informacion del Usuario: ", error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
     }
 }
 
+exports.ListUsers = async (req,res)=>{
+    try {
+       const usuarios = await userModel.ListUsers();
+        res.status(200).json({ message: "Usuarios Listados",usuarios}); // Enviamos los usuarios en la respuesta
+    } catch (error) {
+        console.error("Error al obtener informacion del Usuario: ", error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
+    }
+}
+
+exports.UpdateStatusUser = async (req,res) => {
+    const {Estado_Usuario,Nombre_Usuario} = req.body;
+    try {
+        const ExisteUser = await userModel.getUserByUsername(Nombre_Usuario);
+        if (ExisteUser) {
+            await userModel.StatusUserbyNameUser(Estado_Usuario,Nombre_Usuario);
+            res.status(200).json({ message: "Estado Actualizado" });
+        }else{
+            return res.status(400).json({ error: 'El usuario no existe' });
+        }
+        
+    } catch (error) {
+        console.error("Error al obtener informacion del Usuario: ", error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
+    }
+}
+
+///////API PARA GESTION PROYECTS
 

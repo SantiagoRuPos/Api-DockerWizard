@@ -11,8 +11,8 @@ exports.getUserByUsername = async (Nombre_Usuario) => {
             console.log("Resultados de la consulta:", results);
             resolve(results[0]);
         });
-    });
-};
+   })
+}
 
 exports.LastConexion = async (Id_Usuario,Conexion_Usuario) => {
     return new Promise((resolve, reject) => {
@@ -44,10 +44,10 @@ exports.UpdatePasswordByUsuer = async (Nombre_Usuario,Password_Usuario)=> {
 }
 
 
-exports.RegisterUser = async (Tipo_Identificacion_Usuario,Numero_Identificacion_Usuario,Nombre_Complreto_Usuario,Correo_Institucional_Usuario,Numero_Contacto,Nombre_Usuario,Password_Usuario,Nombre_Usuario_Cygnus,Fecha_Registro_Usuario) =>{
+exports.RegisterUser = async (Tipo_Identificacion_Usuario,Numero_Identificacion_Usuario,Nombre_Completo_Usuario,Correo_Institucional_Usuario,Numero_Contacto,Nombre_Usuario,Password_Usuario,Nombre_Usuario_Cygnus,Fecha_Registro_Usuario) =>{
     return new Promise((resolve, reject)=>{
-        const sql = 'INSERT INTO Usuarios (Id_Usuario,Tipo_Identificacion_Usuario,Numero_Identificacion_Usuario,Nombre_Complreto_Usuario,Correo_Institucional_Usuario,Numero_Contacto,Nombre_Usuario,Password_Usuario,Nombre_Usuario_Cygnus,Rol_Usuario,Estado_Usuario,Conexion_Usuario,Fecha_Registro_Usuario,RenovacionContraseña) VALUES (null,?,?,?,?,?,?,?,?,"1","2",null,?,null)';
-            db.query(sql,[Tipo_Identificacion_Usuario,Numero_Identificacion_Usuario,Nombre_Complreto_Usuario,Correo_Institucional_Usuario,Numero_Contacto,Nombre_Usuario,Password_Usuario,Nombre_Usuario_Cygnus,Fecha_Registro_Usuario],(error,results)=>{
+        const sql = 'INSERT INTO Usuarios (Id_Usuario,Tipo_Identificacion_Usuario,Numero_Identificacion_Usuario,Nombre_Completo_Usuario,Correo_Institucional_Usuario,Numero_Contacto,Nombre_Usuario,Password_Usuario,Nombre_Usuario_Cygnus,Rol_Usuario,Estado_Usuario,Conexion_Usuario,Fecha_Registro_Usuario,RenovacionContraseña) VALUES (null,?,?,?,?,?,?,?,?,"1","2",null,?,null)';
+            db.query(sql,[Tipo_Identificacion_Usuario,Numero_Identificacion_Usuario,Nombre_Completo_Usuario,Correo_Institucional_Usuario,Numero_Contacto,Nombre_Usuario,Password_Usuario,Nombre_Usuario_Cygnus,Fecha_Registro_Usuario],(error,results)=>{
                 if (error) {
                     console.error("Error. Insert: ", error);
                     reject (error);
@@ -62,13 +62,14 @@ exports.RegisterUser = async (Tipo_Identificacion_Usuario,Numero_Identificacion_
 
 exports.ListUsersByUserName = async(Nombre_Usuario) => {
      return new Promise((resolve, reject)=>{
-        const sql = 'SELECT Id_Usuario,Nombre_Complreto_Usuario,Nombre_Usuario,Nombre_Usuario_Cygnus,Correo_Institucional_Usuario,Conexion_Usuario,Estado_Usuario FROM Usuarios WHERE Nombre_Usuario = ?';
+        const sql = 'SELECT Id_Usuario,Nombre_Completo_Usuario,Nombre_Usuario,Nombre_Usuario_Cygnus,Correo_Institucional_Usuario,Conexion_Usuario,Estado_Usuario FROM Usuarios WHERE Nombre_Usuario = ?';
         db.query(sql,[Nombre_Usuario],(error,results)=> {
             if (error) {
                 console.error("Error al listar : ", error);
                 reject (error);
             }else {
                 console.log("Usuario Listado");
+                console.log("Resultado ->", results);
                 resolve(results[0]);
             }
         })
@@ -78,13 +79,14 @@ exports.ListUsersByUserName = async(Nombre_Usuario) => {
 
 exports.ListUsers = async ()=> {
   return new Promise((resolve, reject) => {
-    const sql ='SELECT  Id_Usuario,Nombre_Complreto_Usuario,Nombre_Usuario,Nombre_Usuario_Cygnus,Correo_Institucional_Usuario,Conexion_Usuario,Estado_Usuario FROM Usuarios';
+    const sql ='SELECT  Id_Usuario,Nombre_Completo_Usuario,Nombre_Usuario,Nombre_Usuario_Cygnus,Correo_Institucional_Usuario,Conexion_Usuario,Estado_Usuario FROM Usuarios';
     db.query(sql,(error,results)=> {
       if (error){
         console.error("Error al listar los usuarios: ", error);
         reject(error);
       }else {
         console.log("Usuarios listados");
+        console.log("Resultado ->", results);
         resolve (results);
       }
 
@@ -92,3 +94,18 @@ exports.ListUsers = async ()=> {
   })
 }
 
+exports.StatusUserbyNameUser = async (Estado_Usuario,Nombre_Usuario) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE Usuarios SET Estado_Usuario = ? WHERE Nombre_Usuario = ?';
+        db.query(sql,[Estado_Usuario,Nombre_Usuario],(error,results)=> {
+            if (error) {
+                console.error("Error al actulizar el estado: ",error);
+                reject(error);
+            }else{
+                console.log("Estado Actulizado");
+                console.log(results);
+                resolve (results);
+            }
+        })
+    })
+}
