@@ -14,6 +14,8 @@ exports.getUserByUsername = async (Nombre_Usuario) => {
    })
 }
 
+
+
 exports.LastConexion = async (Id_Usuario,Conexion_Usuario) => {
     return new Promise((resolve, reject) => {
         const sql ='UPDATE Usuarios SET  Conexion_Usuario = ? WHERE Id_Usuario = ?';
