@@ -12,6 +12,8 @@ router.post('/ListarUsuario',authController.ListUser);
 router.get('/ListUsers',authController.ListUsers);
 router.post('/UpdateStatusUser',authController.UpdateStatusUser);
 
+router.post('/userinfo',authController.getUserInfo);
+
 //API PROYECTOS
 router.post('/NewProject',ProjectModel.NewProject);
 router.post('/BuscarProyecto',ProjectModel.GetProjectByname);

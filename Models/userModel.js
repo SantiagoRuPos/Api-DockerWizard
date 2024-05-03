@@ -14,6 +14,18 @@ exports.getUserByUsername = async (Nombre_Usuario) => {
    })
 }
 
+exports.infoUser = async (userId) => {
+    return new Promise((resolve, reject) => {
+        db.query('SELECT Id_Usuario,Nombre_Completo_Usuario,Correo_Institucional_Usuario,Numero_Contacto,Nombre_Usuario,Nombre_Usuario_Cygnus   FROM Usuarios WHERE Id_Usuario = ? ', [userId], (error, results) => {
+            if (error) {
+                console.error("Error al ejecutar la consulta:", error);
+                return reject(error);
+            }
+            console.log("Informacion Usuario :", results);
+            resolve(results[0]);
+        });
+   })
+}
 
 
 exports.LastConexion = async (Id_Usuario,Conexion_Usuario) => {
