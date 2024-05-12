@@ -30,3 +30,52 @@ return new Promise ((resolve, reject) => {
     })
 })
 }
+
+exports.ListProjectsByname = async (Nombre_Proyecto)=>{
+    return new Promise ((resolve, reject)=> {
+        const sql ='SELECT Nombre_Proyecto, Rol_Proyecto, Nombre_Lider_Proyecto, Programa_Academico_Proyecto, Fecha_Registro_Proyecto, Fecha_Finalizacion_Proyecto, Estado_Proyecto FROM Proyectos WHERE Nombre_Proyecto = ?';
+     
+        db.query(sql,[Nombre_Proyecto],(error,results)=>{
+       
+            if (error) {
+                console.error("Error en consulta --->",error);
+            reject(error);
+            } else {
+                console.log("Proyecto Listado correctamente");
+                resolve(results);
+            }
+
+        })
+    })
+}
+
+exports.ListAllProjects = async ()=>{
+    return new Promise ((resolve, reject)=> {
+        const sql ='SELECT Nombre_Proyecto, Rol_Proyecto, Nombre_Lider_Proyecto, Programa_Academico_Proyecto, Fecha_Registro_Proyecto, Fecha_Finalizacion_Proyecto, Estado_Proyecto FROM Proyectos';
+        db.query(sql,(error,results)=>{
+            if (error) {
+                console.error("Error en consulta --->",error);
+            reject(error);
+            } else {
+                console.log("Proyecto Listado correctamente");
+                resolve(results);
+            }
+
+        })
+    })
+}
+
+exports.UpdateStatusProject = async (Fecha_Finalizacion_Proyecto,Estado_Proyecto,Nombre_Proyecto)=>{
+    return new Promise ((resolve, reaject)=> {
+        const sql = 'UPDATE Proyectos SET  Fecha_Finalizacion_Proyecto = ? , Estado_Proyecto = ? WHERE Nombre_Proyecto = ?';
+        db.query(sql,[Fecha_Finalizacion_Proyecto,Estado_Proyecto,Nombre_Proyecto],(error,results)=>{
+            if (error) {
+                console.error("Error en consulta --->",error);
+                reject(error);
+            } else {
+                console.log("Proyecto Modificado correctamente");
+                resolve(results);
+            }
+        })
+    })
+}

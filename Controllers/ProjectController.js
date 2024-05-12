@@ -1,5 +1,4 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+
 const ProyectModel = require ('../Models/ProjectModel');
 const moment = require('moment-timezone');
 require('dotenv').config();
@@ -41,5 +40,52 @@ exports.NewProject=async (req,res)=> {
     }
 }
 
+exports.ListProject = async (req,res) => {
+    const {Nombre_Proyecto}=req.body;
+    try {
+        const proyecto = await ProyectModel.GetProjectByName(Nombre_Proyecto);
+        if (proyecto) {
+            const Proyect = await ProyectModel.ListProjectsByname(Nombre_Proyecto);
+            res.status(200).json({ message: "Proyecto Listado", Proyect });
+        }
+        else{
+            return res.status(400).json({ error: 'El proyecto no existe' });
+
+        }
+    } catch (error) {
+        console.error("Error al listar el Proyecto:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+}
 
 
+
+exports.ListAllProjects = async (req,res) => {
+    try {
+            const Proyects = await ProyectModel.ListAllProjects();
+            res.status(200).json({ message: "Proyectos Listados", Proyects });
+            console.log(Proyects);
+    } catch (error) {
+        console.error("Error al listar el Proyecto:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+}
+
+exports.UpdateProjects= async (req,res)=> {
+    const {Estado_Proyecto,Nombre_Proyecto}=req.body;
+    try {
+        const proyecto = await ProyectModel.GetProjectByName(Nombre_Proyecto);
+        if (proyecto) {
+            const Fecha_Finalizacion_Proyecto = moment().tz('America/Bogota').format('YYYY-MM-DD HH:mm:ss');
+         await ProyectModel.UpdateStatusProject(Fecha_Finalizacion_Proyecto,Estado_Proyecto,Nombre_Proyecto)
+         res.status(200).json({message:"Proecto Actualizado"});
+        }
+        else{
+            return res.status(400).json({ error: 'El proyecto no existe' });
+
+        }
+    } catch (error) {
+        
+    }
+
+}

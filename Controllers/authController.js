@@ -66,11 +66,17 @@ exports.UpdatePasswordByUsuer =async (req, res) => {
     const { Nombre_Usuario, Password_Usuario} = req.body;
 
     try {
+        const exiteUsuario = await userModel.getUserByUsername(Nombre_Usuario);
+        if (exiteUsuario) {
         const hashedPassword = await bcrypt.hash(Password_Usuario,10);
-        console.log(hashedPassword);
-        console.log("Contraseña Actualizada uwu");
+        //console.log(hashedPassword);
+        console.log("Contraseña Actualizada.");
         await userModel.UpdatePasswordByUsuer(Nombre_Usuario, hashedPassword);
         res.status(200).json({message:"Contraseña Actualizada"});
+        }else {
+            return res.status(400).json({ error: 'El usuario no existe' });
+        }
+   
     } catch (error) {
         console.error("Error al actualizar la contraseña:", error);
         res.status(500).json({ message: "Error interno del servidor" });
