@@ -27,4 +27,6 @@ router.post('/UpdateProject',ProjectController.UpdateProjects);
 router.post('/NewUserCygnus',Cygnus.crearUsuario);
 router.get('/ListUserCygnus',Cygnus.ListUserCygnus);
 router.get('/ProcessCygnus',Cygnus.ProcessCygnus);
+router.get('/MonitorUserCygnus',Cygnus.MonitorUserCygnus);
+
 module.exports = router;
