@@ -4,8 +4,7 @@ const { exec } = require('child_process');
 
 exports.crearUsuario = (req, res) => {
   const { Nombre_Usuario_Cygnus, Password_Usuario } = req.body;
-
-  exec(`sudo adduser --disabled-password --gecos "" ${Nombre_Usuario_Cygnus} && echo "${Nombre_Usuario_Cygnus}:${Password_Usuario}" | sudo chpasswd`, (error, stdout, stderr) => {
+  exec(`sudo adduser --disabled-password --gecos "" --force-badname ${Nombre_Usuario_Cygnus} && echo "${Nombre_Usuario_Cygnus}:${Password_Usuario}" | sudo chpasswd`, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error al crear el usuario: ${error.message}`);
       return res.status(500).json({ error: 'Error al crear el usuario' });
@@ -18,6 +17,7 @@ exports.crearUsuario = (req, res) => {
     res.status(200).json({ message: 'Usuario creado correctamente' });
   });
 };
+
 
 
 
