@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const userModel = require ('../Models/userModel');
 const moment = require('moment-timezone');
 
-var IdUsuario;
 require('dotenv').config();
  /////////API USUARIOS
 

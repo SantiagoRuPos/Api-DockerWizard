@@ -1,4 +1,6 @@
 const { exec } = require('child_process');
+const { error } = require('console');
+const { stdout, stderr } = require('process');
 
 
 
@@ -86,7 +88,69 @@ exports.MonitorUserCygnus = (req, res) => {
     });
 }
 
-exports.ResetPasswordCygnus = (req,res)=>{
+exports.ResetPasswordCygnus = (req, res) => {
   const { Nombre_Usuario_Cygnus, Password_Usuario } = req.body;
+
+  if (!Nombre_Usuario_Cygnus || !Password_Usuario) {
+    return res.status(400).send('Nombre de usuario y contraseña son requeridos');
+  }
+
+  // Comando para cambiar la contraseña del usuario y forzar el cambio en el siguiente inicio de sesión
+  const command = `echo "${Nombre_Usuario_Cygnus}:${Password_Usuario}" | sudo chpasswd && sudo chage -d 0 ${Nombre_Usuario_Cygnus}`;
+
+  // Ejecutar el comando
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+         return res.status(500).json({ error: 'Error al restablecer la Contraseña del usuario' });
+    }
+    console.log("Contraseña cambiada exitosamente y debera de cambiarla al siguiente inicio");
+    res.status(200).json({ message: 'Contraseña  cambiada correctamente' });
+  });
+}
+
+exports.PermisosCygnus = (req, res) => {
+  const { Nombre_Usuario_Cygnus, Grupo_Cygnus } = req.body;
+ 
+  if (!Nombre_Usuario_Cygnus || !Grupo_Cygnus) {
+    return res.status(400).json({error:'Nombre_Usuario_Cygnus y Grupo_Cygnus son requeridos'});
+  }
+
+  const command = `sudo usermod -a -G ${Grupo_Cygnus} ${Nombre_Usuario_Cygnus}`;
+
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error ejecutando el comando: ${error.message}`);
+      return res.status(500).json({ error: 'Error al agregar al usuario al grupo ' });
+    }
+    if (stderr) {
+      console.error(`Error en stderr: ${stderr}`);
+      return res.status(500).json({ error: 'Error stderr ' });
+    }
+    console.log(`Comando ejecutado correctamente: ${stdout}`);
+    res.status(200).json({ message: 'Usuario añadido al grupo ' });
+  });
+}
+
+
+exports.QuitarPermiso = (req, res) => {
+  const { Nombre_Usuario_Cygnus, Grupo_Cygnus } = req.body;
   
+  if (!Nombre_Usuario_Cygnus || !Grupo_Cygnus) {
+    return res.status(400).json({ error: 'Nombre_Usuario_Cygnus y Grupo_Cygnus son requeridos' });
+  }
+  
+  const command = `sudo gpasswd -d ${Nombre_Usuario_Cygnus} ${Grupo_Cygnus}`;
+
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error ejecutando el comando: ${error.message}`);
+      return res.status(500).json({ error: `Error ejecutando el comando: ${error.message}` });
+    }
+    if (stderr) {
+      console.error(`Error en stderr: ${stderr}`);
+      return res.status(500).json({ error: `Error en stderr: ${stderr}` });
+    }
+    console.log(`Comando ejecutado correctamente: ${stdout}`);
+    res.status(200).json({ message: `Usuario ${Nombre_Usuario_Cygnus} eliminado del grupo ${Grupo_Cygnus}` });
+  });
 }

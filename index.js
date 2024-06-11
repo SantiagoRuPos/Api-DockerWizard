@@ -4,10 +4,10 @@ const cors = require('cors');
 const dtabase = require('./db');
 const routes = require('./Routes/index');
 
-const listarImagenesDocker = require ('./Controllers/imagenes');
+
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 17223;
 
 app.use(express.json());
 app.use(cors());
@@ -15,7 +15,7 @@ app.use(cors());
 //rutas
 app.use('/',routes);
 
-app.get('/listar-imagenes-docker', listarImagenesDocker.listarImagenesDocker);
+
 
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
