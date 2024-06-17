@@ -3,7 +3,7 @@ const router = express.Router();
 //Rutas DockerWizard
 const authController = require('../Controllers/authController');
 const ProjectController = require('../Controllers/ProjectController');
-
+const AutomatizacionDocker = require ('../Controllers/AutomatizacionDockers')
 
 //Rutas Cygnus
 const Cygnus = require('../Controllers/CygnusController');
@@ -33,5 +33,6 @@ router.post('/PermisosCygnus',Cygnus.PermisosCygnus);
 router.post('/QuitarPermiso',Cygnus.QuitarPermiso);
 
 //API AUTOMATIZACION DOCKERS
+router.get('/StateContaineres',AutomatizacionDocker.StateContaineres);
 
 module.exports = router;
