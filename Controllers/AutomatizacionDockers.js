@@ -2,7 +2,7 @@ const { exec } = require('child_process');
 
 
 
-exports.StateContaineres = (req, res) => {
+exports.StateContainers = (req, res) => {
   const dockerCommand = 'docker ps -a --format "{{.ID}}|{{.Image}}|{{.Command}}|{{.CreatedAt}}|{{.Status}}|{{.Ports}}|{{.Names}}"';
 
   exec(dockerCommand, (error, stdout, stderr) => {
@@ -21,5 +21,6 @@ exports.StateContaineres = (req, res) => {
     });
     
     res.status(200).json({ containers: containersData });
+    console.log(containersData);
   });
 };

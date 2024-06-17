@@ -33,6 +33,6 @@ router.post('/PermisosCygnus',Cygnus.PermisosCygnus);
 router.post('/QuitarPermiso',Cygnus.QuitarPermiso);
 
 //API AUTOMATIZACION DOCKERS
-router.get('/StateContaineres',AutomatizacionDocker.StateContaineres);
+router.get('/StateContainers',AutomatizacionDocker.StateContainers);
 
 module.exports = router;
