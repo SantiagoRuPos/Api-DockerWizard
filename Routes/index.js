@@ -34,5 +34,11 @@ router.post('/QuitarPermiso',Cygnus.QuitarPermiso);
 
 //API AUTOMATIZACION DOCKERS
 router.get('/StateContainers',AutomatizacionDocker.StateContainers);
-
+router.get('/BackUp',AutomatizacionDocker.BackUp);
+router.get('/DockerUp' ,AutomatizacionDocker.DockerUp);
+router.post('/DockerLogs', AutomatizacionDocker.DockerLogs);
+router.get('/MonitoringImages', AutomatizacionDocker.MonitoringImages);
+router.post('/NewRuta',AutomatizacionDocker.NewRuta);
+router.post('/NewDockerWeb',AutomatizacionDocker.NewDockerWeb);
+router.post('/DockerBd', AutomatizacionDocker.DockerBd);
 module.exports = router;
