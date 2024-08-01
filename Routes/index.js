@@ -41,4 +41,6 @@ router.get('/MonitoringImages', AutomatizacionDocker.MonitoringImages);
 router.post('/NewRuta',AutomatizacionDocker.NewRuta);
 router.post('/NewDockerWeb',AutomatizacionDocker.NewDockerWeb);
 router.post('/DockerBd', AutomatizacionDocker.DockerBd);
+router.post('/DockerWebBd', AutomatizacionDocker.DockerWebBd);
+
 module.exports = router;

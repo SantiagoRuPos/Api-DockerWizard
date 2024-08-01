@@ -179,7 +179,7 @@ location /${NmaeRuta}/ {
 }
 
 exports.NewDockerWeb = async (req, res) => {
-  const { NombreContenedor, image, volumnes, dockerName } = req.body;
+  const { NombreContenedor, image, volumenes, dockerName } = req.body;
 
   // Validación de campos requeridos
   if (!NombreContenedor) {
@@ -190,7 +190,7 @@ exports.NewDockerWeb = async (req, res) => {
     return res.status(400).json({ error: 'La imagen es requerida' });
   }
 
-  if (!volumnes) {
+  if (!volumenes) {
     return res.status(400).json({ error: 'El volumen del Docker es requerido' });
   }
 
@@ -203,7 +203,7 @@ exports.NewDockerWeb = async (req, res) => {
     image: ${image}
     container_name: ${dockerName}
     volumes:
-      - ${volumnes}
+      - ${volumenes}:/var/www/html
     expose:
       - 8000
       - 80
@@ -248,7 +248,7 @@ exports.NewDockerWeb = async (req, res) => {
       res.status(200).json({ message: 'Archivo Docker Compose actualizado exitosamente', config: newServiceConfig });
     });
   });
-};
+}
 
 
 exports.DockerBd = async (req, res) => {
@@ -259,7 +259,7 @@ exports.DockerBd = async (req, res) => {
     MYSQL_USER,
     MYSQL_PASSWORD,
     MYSQL_ROOT_PASSWORD,
-    volumnes,
+    volumenes,
     dockerName,
     NombreContenedorPHPmyadmin,
     imagePHPmyadmin,
@@ -269,7 +269,7 @@ exports.DockerBd = async (req, res) => {
   } = req.body;
 
   // Validación de campos requeridos
-  if (!NombreContenedor || !image || !MYSQL_DATABASE || !MYSQL_USER || !MYSQL_PASSWORD || !MYSQL_ROOT_PASSWORD || !volumnes || !dockerName) {
+  if (!NombreContenedor || !image || !MYSQL_DATABASE || !MYSQL_USER || !MYSQL_PASSWORD || !MYSQL_ROOT_PASSWORD || !volumenes || !dockerName) {
     return res.status(400).json({ error: 'Todos los campos para el contenedor MySQL son requeridos' });
   }
 
@@ -288,9 +288,9 @@ exports.DockerBd = async (req, res) => {
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     expose:
-      - "3306"
+      - 3306
     volumes:
-      - ${volumnes}:/var/lib/mysql
+      - ${volumenes}:/var/lib/mysql
     networks:
       - website
     restart: always
@@ -304,8 +304,8 @@ exports.DockerBd = async (req, res) => {
     environment:
       - PMA_HOST=${PMA_HOST}
     expose:
-      - "80"
-      - "8080"
+      - 80
+      - 8080
     depends_on:
       - ${depends_on}
     networks:
@@ -349,4 +349,132 @@ exports.DockerBd = async (req, res) => {
       res.status(200).json({ message: 'Archivo Docker Compose actualizado exitosamente', config: mysqlServiceConfig });
     });
   });
-};
+}
+
+
+exports.DockerWebBd = async (req, res) => {
+  const {
+    NombreContenedorWEB,
+    imageWEB,
+    volumenesWEB,
+    dockerNameWEB,
+    linksWEB, 
+    NombreContenedorMYSQL,
+    imageMYSQL,
+    MYSQL_DATABASE,
+    MYSQL_USER,
+    MYSQL_PASSWORD,
+    MYSQL_ROOT_PASSWORD,
+    volumenesMYSQL,
+    dockerNameMYSQL,
+    NombreContenedorPHPmyadmin,
+    imagePHPmyadmin,
+    dockerNamephpmyadmin,
+    PMA_HOST,
+    depends_on
+  } = req.body;
+
+  // Validación de campos requeridos
+  if (!NombreContenedorWEB || !imageWEB || !volumenesWEB || !dockerNameWEB) {
+    return res.status(400).json({ error: 'Todos los campos para el contenedor web son requeridos' });
+  }
+
+  if (!NombreContenedorMYSQL || !imageMYSQL || !MYSQL_DATABASE || !MYSQL_USER || !MYSQL_PASSWORD || !MYSQL_ROOT_PASSWORD || !volumenesMYSQL || !dockerNameMYSQL) {
+    return res.status(400).json({ error: 'Todos los campos para el contenedor MySQL son requeridos' });
+  }
+
+  if (!NombreContenedorPHPmyadmin || !imagePHPmyadmin || !dockerNamephpmyadmin || !PMA_HOST || !depends_on) {
+    return res.status(400).json({ error: 'Todos los campos para el contenedor phpMyAdmin son requeridos' });
+  }
+
+  // Configuración para el contenedor web
+  const webServiceConfig = `
+  ${NombreContenedorWEB}:
+    image: ${imageWEB}
+    container_name: ${dockerNameWEB}
+    volumes:
+      - ${volumenesWEB}:/var/www/html
+    links:
+      - ${linksWEB}
+    expose:
+      - 8000
+      - 80
+    networks:
+      - website
+    restart: always
+  `;
+
+  // Configuración para el contenedor MySQL
+  const mysqlServiceConfig = `
+  ${NombreContenedorMYSQL}:
+    image: ${imageMYSQL}
+    container_name: ${dockerNameMYSQL}
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    expose:
+      - 3306
+    volumes:
+      - ${volumenesMYSQL}:/var/lib/mysql
+    networks:
+      - website
+    restart: always
+  `;
+
+  // Configuración para el contenedor phpMyAdmin
+  const phpmyadminServiceConfig = `
+  ${NombreContenedorPHPmyadmin}:
+    image: ${imagePHPmyadmin}
+    container_name: ${dockerNamephpmyadmin}
+    environment:
+      - PMA_HOST=${PMA_HOST}
+    expose:
+      - 80
+      - 8080
+    depends_on:
+      - ${depends_on}
+    networks:
+      - website
+    restart: always
+  `;
+
+  const filePath = '/home/santi/docker-compose.yml';
+
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error al leer el archivo Docker Compose' });
+    }
+
+    // Encontrar las secciones de volúmenes y redes
+    const volumesSectionIndex = data.indexOf('\nvolumes:');
+    const networksSectionIndex = data.indexOf('\nnetworks:');
+
+    let insertionIndex = data.length;
+
+    // Determinar la posición de inserción basada en las secciones encontradas
+    if (volumesSectionIndex !== -1) {
+      insertionIndex = volumesSectionIndex;
+    } else if (networksSectionIndex !== -1) {
+      insertionIndex = networksSectionIndex;
+    }
+
+    // Insertar los nuevos servicios antes de las secciones de volúmenes y redes, si existen
+    const updatedConfig = [
+      data.slice(0, insertionIndex),
+      webServiceConfig,
+      mysqlServiceConfig,
+      phpmyadminServiceConfig,
+      data.slice(insertionIndex)
+    ].join('');
+
+    // Escribir el archivo actualizado
+    fs.writeFile(filePath, updatedConfig, 'utf8', (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error al actualizar el archivo Docker Compose' });
+      }
+      res.status(200).json({ message: 'Archivo Docker Compose actualizado exitosamente', config: { webServiceConfig, mysqlServiceConfig, phpmyadminServiceConfig } });
+    });
+  });
+}
