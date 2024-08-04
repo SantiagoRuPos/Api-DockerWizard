@@ -42,5 +42,6 @@ router.post('/NewRuta',AutomatizacionDocker.NewRuta);
 router.post('/NewDockerWeb',AutomatizacionDocker.NewDockerWeb);
 router.post('/DockerBd', AutomatizacionDocker.DockerBd);
 router.post('/DockerWebBd', AutomatizacionDocker.DockerWebBd);
-
+router.post('/UpdateContenedores', AutomatizacionDocker.InstalacionesDocker);
+router.post('/DockerRestart',AutomatizacionDocker.DockerRestar);
 module.exports = router;

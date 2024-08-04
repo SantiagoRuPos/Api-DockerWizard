@@ -355,7 +355,7 @@ exports.DockerBd = async (req, res) => {
 exports.DockerWebBd = async (req, res) => {
   const {
     NombreContenedorWEB,
-    imageWEB,
+    image,
     volumenesWEB,
     dockerNameWEB,
     linksWEB, 
@@ -375,7 +375,7 @@ exports.DockerWebBd = async (req, res) => {
   } = req.body;
 
   // Validación de campos requeridos
-  if (!NombreContenedorWEB || !imageWEB || !volumenesWEB || !dockerNameWEB) {
+  if (!NombreContenedorWEB || !image || !volumenesWEB || !dockerNameWEB) {
     return res.status(400).json({ error: 'Todos los campos para el contenedor web son requeridos' });
   }
 
@@ -390,7 +390,7 @@ exports.DockerWebBd = async (req, res) => {
   // Configuración para el contenedor web
   const webServiceConfig = `
   ${NombreContenedorWEB}:
-    image: ${imageWEB}
+    image: ${image}
     container_name: ${dockerNameWEB}
     volumes:
       - /home/${volumenesWEB}:/var/www/html
@@ -478,12 +478,11 @@ exports.DockerWebBd = async (req, res) => {
     });
   });
 }
-
 exports.InstalacionesDocker = async (req, res) => {
   const { nombreContenedor } = req.body;
 
   if (!nombreContenedor) {
-    return res.status(400).send('Nombre del contenedor es requerido');
+    return res.status(400).json({ error: 'Nombre del contenedor es requerido' });
   }
 
   const commands = [
@@ -499,24 +498,34 @@ exports.InstalacionesDocker = async (req, res) => {
   exec(dockerCommand, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error ejecutando comandos Docker: ${error}`);
-      return res.status(500).send(`Error ejecutando comandos Docker: ${error.message}`);
+      return res.status(500).json({ error: `Error ejecutando comandos Docker: ${error.message}` });
     }
     if (stderr) {
       console.error(`Error: ${stderr}`);
-      return res.status(500).send(`Error: ${stderr}`);
+      return res.status(500).json({ error: `Error: ${stderr}` });
     }
     console.log(`Output: ${stdout}`);
-    res.send(`Comandos ejecutados exitosamente:\n${stdout}`);
+
+    res.status(200).json({ message: 'Comandos ejecutados exitosamente', output: stdout });
+
+    // Llama a DockerRestar después de enviar la respuesta
+    exec(`docker restart ${nombreContenedor}`, (restartError, restartStdout, restartStderr) => {
+      if (restartError) {
+        console.error(`Error reiniciando el contenedor: ${restartError}`);
+      }
+      if (restartStderr) {
+        console.error(`Error: ${restartStderr}`);
+      }
+      console.log(`Output: ${restartStdout}`);
+    });
   });
-  //------
-  this.DockerRestar(nombreContenedor);
 }
 
 exports.DockerRestar = async (req, res) => {
   const { nombreContenedor } = req.body;
 
   if (!nombreContenedor) {
-    return res.status(400).send('Nombre del contenedor es requerido');
+    return res.status(400).json({ error: 'Nombre del contenedor es requerido' });
   }
 
   const dockerCommand = `docker restart ${nombreContenedor}`;
@@ -524,14 +533,13 @@ exports.DockerRestar = async (req, res) => {
   exec(dockerCommand, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error ejecutando comando Docker: ${error}`);
-      return res.status(500).send(`Error ejecutando comando Docker: ${error.message}`);
+      return res.status(500).json({ error: `Error ejecutando comando Docker: ${error.message}` });
     }
     if (stderr) {
       console.error(`Error: ${stderr}`);
-      return res.status(500).send(`Error: ${stderr}`);
+      return res.status(500).json({ error: `Error: ${stderr}` });
     }
     console.log(`Output: ${stdout}`);
-    res.send(`Contenedor ${nombreContenedor} reiniciado exitosamente:\n${stdout}`);
+    res.status(200).json({ message: `Contenedor ${nombreContenedor} reiniciado exitosamente`, output: stdout });
   });
 }
-
