@@ -60,7 +60,7 @@ exports.BackUp = async (req, res) => {
 
 exports.DockerUp = async (req, res) => {
   // Define el comando para ejecutar docker-compose up
-  const comando = 'docker-compose -f /home/santi/docker-compose.yml up -d';
+  const comando = 'docker-compose -f /home/santi/Documents/docker-compose.yml up -d';
 
   // Ejecuta el comando
   exec(comando, (error, stdout, stderr) => {
@@ -212,7 +212,7 @@ exports.NewDockerWeb = async (req, res) => {
     restart: always
   `;
 
-  const filePath = '/home/santi/docker-compose.yml';
+  const filePath = '/home/santi/Documents/docker-compose.yml';
 
   // Leer el archivo existente
   fs.readFile(filePath, 'utf8', (err, data) => {
@@ -358,7 +358,7 @@ exports.DockerWebBd = async (req, res) => {
     image,
     volumenesWEB,
     dockerNameWEB,
-    linksWEB, 
+    linksWEB,
     NombreContenedorMYSQL,
     imageMYSQL,
     MYSQL_DATABASE,
@@ -478,6 +478,9 @@ exports.DockerWebBd = async (req, res) => {
     });
   });
 }
+
+
+
 exports.InstalacionesDocker = async (req, res) => {
   const { nombreContenedor } = req.body;
 
@@ -485,15 +488,17 @@ exports.InstalacionesDocker = async (req, res) => {
     return res.status(400).json({ error: 'Nombre del contenedor es requerido' });
   }
 
+  // Comandos a ejecutar dentro del contenedor
   const commands = [
     'apt update',
+    'apt-get install -y apt-utils',  // Instalación de apt-utils para reducir advertencias
     'apt-get install -y zlib1g-dev',
     'apt-get install -y libpng-dev',
-    'docker-php-ext-install mysqli',
-    'docker-php-ext-enable mysqli'
+    'docker-php-ext-install mysqli || true',  // Ignora errores si mysqli ya está instalado
+    'docker-php-ext-enable mysqli || true'   // Ignora errores si mysqli ya está habilitado
   ];
 
-  const dockerCommand = `docker exec -it ${nombreContenedor} bash -c "${commands.join(' && ')}"`;
+  const dockerCommand = `docker exec ${nombreContenedor} bash -c "${commands.join(' && ')}"`;
 
   exec(dockerCommand, (error, stdout, stderr) => {
     if (error) {
@@ -501,25 +506,24 @@ exports.InstalacionesDocker = async (req, res) => {
       return res.status(500).json({ error: `Error ejecutando comandos Docker: ${error.message}` });
     }
     if (stderr) {
-      console.error(`Error: ${stderr}`);
-      return res.status(500).json({ error: `Error: ${stderr}` });
+      console.error(`Advertencias y errores: ${stderr}`);
     }
     console.log(`Output: ${stdout}`);
 
     res.status(200).json({ message: 'Comandos ejecutados exitosamente', output: stdout });
 
-    // Llama a DockerRestar después de enviar la respuesta
+    // Reinicia el contenedor después de ejecutar los comandos
     exec(`docker restart ${nombreContenedor}`, (restartError, restartStdout, restartStderr) => {
       if (restartError) {
         console.error(`Error reiniciando el contenedor: ${restartError}`);
       }
       if (restartStderr) {
-        console.error(`Error: ${restartStderr}`);
+        console.error(`Error reiniciando el contenedor: ${restartStderr}`);
       }
-      console.log(`Output: ${restartStdout}`);
+      console.log(`Output del reinicio: ${restartStdout}`);
     });
   });
-}
+};
 
 exports.DockerRestar = async (req, res) => {
   const { nombreContenedor } = req.body;
