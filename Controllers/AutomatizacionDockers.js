@@ -203,7 +203,7 @@ exports.NewDockerWeb = async (req, res) => {
     image: ${image}
     container_name: ${dockerName}
     volumes:
-      - ${volumenes}:/var/www/html
+      - /home/${volumenes}:/var/www/html
     expose:
       - 8000
       - 80
@@ -290,7 +290,7 @@ exports.DockerBd = async (req, res) => {
     expose:
       - 3306
     volumes:
-      - ${volumenes}:/var/lib/mysql
+      - /home/${volumenes}:/var/lib/mysql
     networks:
       - website
     restart: always
@@ -393,7 +393,7 @@ exports.DockerWebBd = async (req, res) => {
     image: ${imageWEB}
     container_name: ${dockerNameWEB}
     volumes:
-      - ${volumenesWEB}:/var/www/html
+      - /home/${volumenesWEB}:/var/www/html
     links:
       - ${linksWEB}
     expose:
@@ -417,7 +417,7 @@ exports.DockerWebBd = async (req, res) => {
     expose:
       - 3306
     volumes:
-      - ${volumenesMYSQL}:/var/lib/mysql
+      - /home/${volumenesMYSQL}:/var/lib/mysql
     networks:
       - website
     restart: always
@@ -478,3 +478,60 @@ exports.DockerWebBd = async (req, res) => {
     });
   });
 }
+
+exports.InstalacionesDocker = async (req, res) => {
+  const { nombreContenedor } = req.body;
+
+  if (!nombreContenedor) {
+    return res.status(400).send('Nombre del contenedor es requerido');
+  }
+
+  const commands = [
+    'apt update',
+    'apt-get install -y zlib1g-dev',
+    'apt-get install -y libpng-dev',
+    'docker-php-ext-install mysqli',
+    'docker-php-ext-enable mysqli'
+  ];
+
+  const dockerCommand = `docker exec -it ${nombreContenedor} bash -c "${commands.join(' && ')}"`;
+
+  exec(dockerCommand, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error ejecutando comandos Docker: ${error}`);
+      return res.status(500).send(`Error ejecutando comandos Docker: ${error.message}`);
+    }
+    if (stderr) {
+      console.error(`Error: ${stderr}`);
+      return res.status(500).send(`Error: ${stderr}`);
+    }
+    console.log(`Output: ${stdout}`);
+    res.send(`Comandos ejecutados exitosamente:\n${stdout}`);
+  });
+  //------
+  this.DockerRestar(nombreContenedor);
+}
+
+exports.DockerRestar = async (req, res) => {
+  const { nombreContenedor } = req.body;
+
+  if (!nombreContenedor) {
+    return res.status(400).send('Nombre del contenedor es requerido');
+  }
+
+  const dockerCommand = `docker restart ${nombreContenedor}`;
+
+  exec(dockerCommand, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error ejecutando comando Docker: ${error}`);
+      return res.status(500).send(`Error ejecutando comando Docker: ${error.message}`);
+    }
+    if (stderr) {
+      console.error(`Error: ${stderr}`);
+      return res.status(500).send(`Error: ${stderr}`);
+    }
+    console.log(`Output: ${stdout}`);
+    res.send(`Contenedor ${nombreContenedor} reiniciado exitosamente:\n${stdout}`);
+  });
+}
+
