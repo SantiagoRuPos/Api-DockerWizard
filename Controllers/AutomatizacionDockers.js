@@ -60,7 +60,7 @@ exports.BackUp = async (req, res) => {
 
 exports.DockerUp = async (req, res) => {
   // Define el comando para ejecutar docker-compose up
-  const comando = 'docker-compose -f /home/santi/Documents/docker-compose.yml up -d';
+  const comando = 'docker-compose -f /home/santi/docker-compose.yml up -d';
 
   // Ejecuta el comando
   exec(comando, (error, stdout, stderr) => {
@@ -178,6 +178,23 @@ location /${NmaeRuta}/ {
   });
 }
 
+exports.CargarRutas = async (req, res) => {
+  const sourcePath = '/home/santi/default.conf';
+  const destinationPath = '/home/proxyreverse/conf.d/default.conf';
+
+  fs.copyFile(sourcePath, destinationPath, (err) => {
+    if (err) {
+      console.error(`Error al copiar el archivo: ${err}`);
+      return res.status(500).json({ error: `Error al copiar el archivo: ${err.message}` });
+    }
+    
+    console.log(`Archivo copiado de ${sourcePath} a ${destinationPath}`);
+    res.status(200).json({ message: `Archivo copiado exitosamente a ${destinationPath}` });
+  });
+}
+
+
+
 exports.NewDockerWeb = async (req, res) => {
   const { NombreContenedor, image, volumenes, dockerName } = req.body;
 
@@ -212,7 +229,7 @@ exports.NewDockerWeb = async (req, res) => {
     restart: always
   `;
 
-  const filePath = '/home/santi/Documents/docker-compose.yml';
+  const filePath = '/home/santi/docker-compose.yml';
 
   // Leer el archivo existente
   fs.readFile(filePath, 'utf8', (err, data) => {
