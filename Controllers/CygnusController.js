@@ -18,7 +18,7 @@ exports.crearUsuario = (req, res) => {
     console.log(`Usuario creado correctamente: ${Nombre_Usuario_Cygnus}`);
     res.status(200).json({ message: 'Usuario creado correctamente' });
   });
-};
+}
 
 
 
