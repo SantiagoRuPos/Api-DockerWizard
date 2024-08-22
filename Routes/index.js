@@ -54,5 +54,6 @@ router.post('/UpdateContenedores', AutomatizacionDocker.InstalacionesDocker);
 router.post('/DockerRestart',AutomatizacionDocker.DockerRestar);
 router.get('/resetRutas',AutomatizacionDocker.CargarRutas);
 
+router.delete('/removecontainer',AutomatizacionDocker.DeleteDocker);
 
 module.exports = router;

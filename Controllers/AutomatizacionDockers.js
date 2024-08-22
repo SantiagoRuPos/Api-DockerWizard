@@ -2,6 +2,7 @@ const { exec } = require('child_process');
 const moment = require('moment-timezone');
 const fs = require('fs');
 
+const YAML = require('yamljs');
 const path = require('path');
 
 
@@ -34,7 +35,7 @@ exports.BackUp = async (req, res) => {
   const formattedDate = date.format('YYYY-MM-DD');
 
   // Define la ruta de la carpeta de respaldo
-  const backupDir = `/home/santi/Backup/${formattedDate}`;
+  const backupDir = `/home/santi/Documents/Backup/${formattedDate}`;
 
   // Crea la carpeta de respaldo con la fecha actual
   fs.mkdir(backupDir, { recursive: true }, (err) => {
@@ -43,7 +44,7 @@ exports.BackUp = async (req, res) => {
     }
 
     // Comando para copiar los archivos a la carpeta de respaldo
-    const comando = `cp /home/santi/docker-compose.yml /home/santi/default.conf ${backupDir}/`;
+    const comando = `cp /home/santi/Documents/docker-compose.yml /home/santi/Documents/default.conf ${backupDir}/`;
 
     // Ejecuta el comando de copia
     exec(comando, (error, stdout, stderr) => {
@@ -60,7 +61,7 @@ exports.BackUp = async (req, res) => {
 
 exports.DockerUp = async (req, res) => {
   // Define el comando para ejecutar docker-compose up
-  const comando = 'docker-compose -f /home/santi/docker-compose.yml up -d';
+  const comando = 'docker-compose -f /home/santi/Documents/docker-compose.yml up -d';
 
   // Ejecuta el comando
   exec(comando, (error, stdout, stderr) => {
@@ -139,7 +140,7 @@ location /${NmaeRuta}/ {
 }
 `;
 
-  const configFilePath = '/home/santi/default.conf';
+  const configFilePath = '/home/santi/Documents/default.conf';
 
   fs.readFile(configFilePath, 'utf8', (err, data) => {
     if (err) {
@@ -179,7 +180,7 @@ location /${NmaeRuta}/ {
 }
 
 exports.CargarRutas = async (req, res) => {
-  const sourcePath = '/home/santi/default.conf';
+  const sourcePath = '/home/santi/Documents/default.conf';
   const destinationPath = '/home/proxyreverse/conf.d/default.conf';
 
   fs.copyFile(sourcePath, destinationPath, (err) => {
@@ -187,7 +188,7 @@ exports.CargarRutas = async (req, res) => {
       console.error(`Error al copiar el archivo: ${err}`);
       return res.status(500).json({ error: `Error al copiar el archivo: ${err.message}` });
     }
-    
+
     console.log(`Archivo copiado de ${sourcePath} a ${destinationPath}`);
     res.status(200).json({ message: `Archivo copiado exitosamente a ${destinationPath}` });
   });
@@ -229,7 +230,7 @@ exports.NewDockerWeb = async (req, res) => {
     restart: always
   `;
 
-  const filePath = '/home/santi/docker-compose.yml';
+  const filePath = '/home/santi/Documents/docker-compose.yml';
 
   // Leer el archivo existente
   fs.readFile(filePath, 'utf8', (err, data) => {
@@ -330,7 +331,7 @@ exports.DockerBd = async (req, res) => {
     restart: always
   `;
 
-  const filePath = '/home/santi/docker-compose.yml';
+  const filePath = '/home/santi/Documents/docker-compose.yml';
 
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
@@ -457,7 +458,7 @@ exports.DockerWebBd = async (req, res) => {
     restart: always
   `;
 
-  const filePath = '/home/santi/docker-compose.yml';
+  const filePath = '/home/santi/Documents/docker-compose.yml';
 
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
@@ -562,5 +563,43 @@ exports.DockerRestar = async (req, res) => {
     }
     console.log(`Output: ${stdout}`);
     res.status(200).json({ message: `Contenedor ${nombreContenedor} reiniciado exitosamente`, output: stdout });
+  });
+}
+
+
+
+exports.DeleteDocker = async (req, res) => {
+  const { NombreContenedor } = req.body;
+
+
+  if (!NombreContenedor) {
+    return res.status(400).json({ error: 'El nombre del Docker es requerido' });
+  }
+
+  const filePath = path.join('/home/santi/Documents', 'docker-compose.yml');
+
+
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error al leer el archivo Docker Compose' });
+    }
+
+    // Crear una expresión regular para buscar y capturar toda la configuración del contenedor
+    const regex = new RegExp(`^\\s*${NombreContenedor}:([\\s\\S]*?restart:\\s*always\\s*)`, 'm');
+
+    if (!regex.test(data)) {
+      return res.status(404).json({ error: 'El contenedor no se encontró en el archivo Docker Compose' });
+    }
+
+    // Eliminar el contenedor y su configuración
+    const updatedData = data.replace(regex, '');
+
+
+    fs.writeFile(filePath, updatedData, 'utf8', (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error al actualizar el archivo Docker Compose' });
+      }
+      res.status(200).json({ message: 'Contenedor Docker y su configuración eliminados exitosamente' });
+    });
   });
 }
