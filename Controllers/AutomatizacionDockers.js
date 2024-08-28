@@ -2,7 +2,7 @@ const { exec } = require('child_process');
 const moment = require('moment-timezone');
 const fs = require('fs');
 
-const YAML = require('yamljs');
+
 const path = require('path');
 
 
@@ -567,39 +567,57 @@ exports.DockerRestar = async (req, res) => {
 }
 
 
-
 exports.DeleteDocker = async (req, res) => {
   const { NombreContenedor } = req.body;
-
 
   if (!NombreContenedor) {
     return res.status(400).json({ error: 'El nombre del Docker es requerido' });
   }
 
+  // Ruta del archivo Docker Compose
   const filePath = path.join('/home/santi/Documents', 'docker-compose.yml');
 
-
-  fs.readFile(filePath, 'utf8', (err, data) => {
+  // Primero, detiene el contenedor
+  exec(`docker stop ${NombreContenedor}`, (err, stdout, stderr) => {
     if (err) {
-      return res.status(500).json({ error: 'Error al leer el archivo Docker Compose' });
+      console.error(`Error al detener el contenedor: ${stderr}`);
+      return res.status(500).json({ error: 'Error al detener el contenedor Docker' });
     }
 
-    // Crear una expresión regular para buscar y capturar toda la configuración del contenedor
-    const regex = new RegExp(`^\\s*${NombreContenedor}:([\\s\\S]*?restart:\\s*always\\s*)`, 'm');
+    console.log(`Contenedor detenido: ${stdout}`);
 
-    if (!regex.test(data)) {
-      return res.status(404).json({ error: 'El contenedor no se encontró en el archivo Docker Compose' });
-    }
-
-    // Eliminar el contenedor y su configuración
-    const updatedData = data.replace(regex, '');
-
-
-    fs.writeFile(filePath, updatedData, 'utf8', (err) => {
+    // Luego, elimina el contenedor
+    exec(`docker rm ${NombreContenedor}`, (err, stdout, stderr) => {
       if (err) {
-        return res.status(500).json({ error: 'Error al actualizar el archivo Docker Compose' });
+        console.error(`Error al eliminar el contenedor: ${stderr}`);
+        return res.status(500).json({ error: 'Error al eliminar el contenedor Docker' });
       }
-      res.status(200).json({ message: 'Contenedor Docker y su configuración eliminados exitosamente' });
+
+      console.log(`Contenedor eliminado: ${stdout}`);
+
+      // Finalmente, elimina la configuración del archivo Docker Compose
+      fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+          return res.status(500).json({ error: 'Error al leer el archivo Docker Compose' });
+        }
+
+        // Crear una expresión regular para buscar y capturar toda la configuración del contenedor
+        const regex = new RegExp(`^\\s*${NombreContenedor}:([\\s\\S]*?restart:\\s*always\\s*)`, 'm');
+
+        if (!regex.test(data)) {
+          return res.status(404).json({ error: 'El contenedor no se encontró en el archivo Docker Compose' });
+        }
+
+        // Eliminar el contenedor y su configuración
+        const updatedData = data.replace(regex, '');
+
+        fs.writeFile(filePath, updatedData, 'utf8', (err) => {
+          if (err) {
+            return res.status(500).json({ error: 'Error al actualizar el archivo Docker Compose' });
+          }
+          res.status(200).json({ message: 'Contenedor Docker detenido, eliminado y configuración actualizada exitosamente' });
+        });
+      });
     });
   });
-}
+};
