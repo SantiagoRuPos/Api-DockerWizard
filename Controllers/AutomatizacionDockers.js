@@ -35,7 +35,7 @@ exports.BackUp = async (req, res) => {
   const formattedDate = date.format('YYYY-MM-DD');
 
   // Define la ruta de la carpeta de respaldo
-  const backupDir = `/home/santi/Documents/Backup/${formattedDate}`;
+  const backupDir = `/home/santiagoruiz/Backup/${formattedDate}`;
 
   // Crea la carpeta de respaldo con la fecha actual
   fs.mkdir(backupDir, { recursive: true }, (err) => {
@@ -44,7 +44,7 @@ exports.BackUp = async (req, res) => {
     }
 
     // Comando para copiar los archivos a la carpeta de respaldo
-    const comando = `cp /home/santi/Documents/docker-compose.yml /home/santi/Documents/default.conf ${backupDir}/`;
+    const comando = `cp /home/santiagoruiz/docker-compose.yml /home/santiagoruiz/default.conf ${backupDir}/`;
 
     // Ejecuta el comando de copia
     exec(comando, (error, stdout, stderr) => {
@@ -61,7 +61,7 @@ exports.BackUp = async (req, res) => {
 
 exports.DockerUp = async (req, res) => {
   // Define el comando para ejecutar docker-compose up
-  const comando = 'docker-compose -f /home/santi/Documents/docker-compose.yml up -d';
+  const comando = 'docker-compose -f /home/santiagoruiz/docker-compose.yml up -d';
 
   // Ejecuta el comando
   exec(comando, (error, stdout, stderr) => {
@@ -140,7 +140,7 @@ location /${NmaeRuta}/ {
 }
 `;
 
-  const configFilePath = '/home/santi/Documents/default.conf';
+  const configFilePath = '/home/santiagoruiz/default.conf';
 
   fs.readFile(configFilePath, 'utf8', (err, data) => {
     if (err) {
@@ -180,7 +180,7 @@ location /${NmaeRuta}/ {
 }
 
 exports.CargarRutas = async (req, res) => {
-  const sourcePath = '/home/santi/Documents/default.conf';
+  const sourcePath = '/home/santiagoruiz/default.conf';
   const destinationPath = '/home/proxyreverse/conf.d/default.conf';
 
   fs.copyFile(sourcePath, destinationPath, (err) => {
@@ -230,7 +230,7 @@ exports.NewDockerWeb = async (req, res) => {
     restart: always
   `;
 
-  const filePath = '/home/santi/Documents/docker-compose.yml';
+  const filePath = '/home/santiagoruiz/docker-compose.yml';
 
   // Leer el archivo existente
   fs.readFile(filePath, 'utf8', (err, data) => {
@@ -331,7 +331,7 @@ exports.DockerBd = async (req, res) => {
     restart: always
   `;
 
-  const filePath = '/home/santi/Documents/docker-compose.yml';
+  const filePath = '/home/santiagoruiz/docker-compose.yml';
 
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
@@ -458,7 +458,7 @@ exports.DockerWebBd = async (req, res) => {
     restart: always
   `;
 
-  const filePath = '/home/santi/Documents/docker-compose.yml';
+  const filePath = '/home/santiagoruiz/docker-compose.yml';
 
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
@@ -575,7 +575,7 @@ exports.DeleteDocker = async (req, res) => {
   }
 
   // Ruta del archivo Docker Compose
-  const filePath = path.join('/home/santi/Documents', 'docker-compose.yml');
+  const filePath = path.join('/home/santiagoruiz/', 'docker-compose.yml');
 
   // Primero, detiene el contenedor
   exec(`docker stop ${NombreContenedor}`, (err, stdout, stderr) => {
