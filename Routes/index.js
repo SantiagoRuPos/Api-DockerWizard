@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 //Rutas DockerWizard
-const authController = require('../Controllers/authController');
+const authController = require('../Controllers/UserController');
 const ProjectController = require('../Controllers/ProjectController');
 const AutomatizacionDocker = require ('../Controllers/AutomatizacionDockers')
 const ReportsController = require ('../Controllers/ReportsController');
@@ -9,7 +9,8 @@ const ReportsController = require ('../Controllers/ReportsController');
 //Rutas Cygnus
 const Cygnus = require('../Controllers/CygnusController');
 router.post('/login',authController.login);
-
+router.post('/forgotPassword',authController.forgotPassword );
+router.post('/UpdatePassword',authController.UpdatePassword);
 //API USUARIO
 router.post('/register-user',authController.RegisterUser);
 router.post('/ListarUsuario',authController.ListUser);
@@ -18,12 +19,12 @@ router.post('/UpdateStatusUser',authController.UpdateStatusUser);
 router.post('/resetPassword',authController.UpdatePasswordByUsuer);
 router.post('/userinfo',authController.getUserInfo);
 
+
 //API REPORTS
 router.post('/searchReports',ReportsController.search );
 router.post('/NewReport',ReportsController.NewReport);
-router.post('/ReportSolved',ReportsController.ReportSolved)
-router.get('/ReportSechar',ReportsController.ReportSechar)
-router.post('/ReportUpdate',ReportsController.ReportUpdate)
+router.post('/ReportUpdate',ReportsController.ReportUpdate);
+
 
 //API PROYECTOS
 router.post('/NewProject',ProjectController.NewProject);

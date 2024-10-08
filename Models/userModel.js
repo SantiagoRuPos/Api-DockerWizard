@@ -16,7 +16,7 @@ exports.getUserByUsername = async (Nombre_Usuario) => {
 
 exports.infoUser = async (userId) => {
     return new Promise((resolve, reject) => {
-        db.query('SELECT Id_Usuario,Nombre_Completo_Usuario,Correo_Institucional_Usuario,Numero_Contacto,Nombre_Usuario,Nombre_Usuario_Cygnus   FROM Usuarios WHERE Id_Usuario = ? ', [userId], (error, results) => {
+        db.query('SELECT Id_Usuario,Nombre_Completo_Usuario,Correo_Institucional_Usuario,Numero_Contacto,Nombre_Usuario,Nombre_Usuario_Cygnus,RenovacionContraseña  FROM Usuarios WHERE Id_Usuario = ? ', [userId], (error, results) => {
             if (error) {
                 console.error("Error al ejecutar la consulta:", error);
                 return reject(error);
@@ -123,3 +123,47 @@ exports.StatusUserbyNameUser = async (Estado_Usuario,Nombre_Usuario) => {
         })
     })
 }
+
+exports.getUserByEmail = async (Correo_Institucional_Usuario) => {
+    return new Promise((resolve, reject) => {
+        const sql ='SELECT Correo_Institucional_Usuario  FROM Usuarios WHERE  Correo_Institucional_Usuario = ? ';
+        db.query(sql,[Correo_Institucional_Usuario],(error,results)=> {
+          if (error){
+            console.error("Error al listar el usuario: ", error);
+            reject(error);
+          }else {
+            console.log("Resultado ->", results);
+            resolve (results);
+          }
+    
+        })
+      })
+}
+
+exports.updateUserPassword = async (Correo_Institucional_Usuario, newPassword) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE Usuarios SET Password_Usuario = ?, RenovacionContraseña = "1" WHERE Correo_Institucional_Usuario = ?';
+        db.query(sql, [newPassword, Correo_Institucional_Usuario], (error, results) => {
+            if (error) {
+                console.error("Error al ejecutar la consulta:", error);
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+};
+
+exports.updateUserPasswordForgot = async (Correo_Institucional_Usuario, newPassword) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE Usuarios SET Password_Usuario = ?, RenovacionContraseña = "0" WHERE Correo_Institucional_Usuario = ?';
+        db.query(sql, [newPassword, Correo_Institucional_Usuario], (error, results) => {
+            if (error) {
+                console.error("Error al ejecutar la consulta:", error);
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+};

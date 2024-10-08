@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.json",
-    "start": "node.js",
+    "start": "index.js",
     "lint": "eslint",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -28,6 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "moment-timezone": "^0.5.45",
     "mysql2": "^3.9.6",
+    "nodemailer": "^6.9.15",
     "sequelize": "^6.37.3"
   }
 }

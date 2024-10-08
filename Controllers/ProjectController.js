@@ -2,6 +2,7 @@
 const ProyectModel = require ('../Models/ProjectModel');
 const moment = require('moment-timezone');
 require('dotenv').config();
+const EmailService = require('./EmailService'); // Importa el servicio de correo
 
 
 exports.GetProjectByname=async (req,res)=>{
@@ -31,6 +32,8 @@ exports.NewProject=async (req,res)=> {
         const Registro_Proyecto = moment().tz('America/Bogota').format('YYYY-MM-DD HH:mm:ss');
         await ProyectModel.RegisterNewProject(Nombre_Proyecto,Nombre_Proyecto_Acronimo,Nombre_Usuario_Cygnus,Rol_Proyecto,Nombre_Lider_Proyecto,Telefono_Lider_Proyecto,Correo_Institucional_Lider,Cargo_Institucional_Lider,Programa_Academico_Proyecto,Semillero_Lider,Grupo_Investigacion,Usuario_Registrador_Proyecto,Registro_Proyecto)
         res.status(200).json({message:"Proyecto Registrado"});
+        await EmailService.sendNewProjectEmail(Correo_Institucional_Lider, Nombre_Proyecto);
+
         }
         
     } catch (error) {
@@ -85,7 +88,8 @@ exports.UpdateProjects= async (req,res)=> {
 
         }
     } catch (error) {
-        
+        console.error('Error al actualizar el proyecto:', error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
     }
 
 }
